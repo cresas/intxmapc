@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>İnteraktif Harita</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+    .bottom-bar {
+      width: 100%;
+      height: 1.2rem;
+      background-color: #262626;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 9999;
+    }
+    .popup-img {
+      width: 100%;
+      max-width: 220px;
+      margin-top: 8px;
+      border-radius: 4px;
+    }
+    .icon-container {
+      background-color: white; /* Arka plan rengi */
+      border: 2px solid #ccc; /* Çerçeve rengi */
+      border-radius: 4px; /* Kenar yuvarlama */
+      padding: 1px; /* İç boşluk */
+      display: inline-block; /* Dikey hizalama için */
+	
+    }
+	  .icon-container:hover {
+      border-color: #sss; /* Hover rengi */
+      transform: scale(1.1); /* Hover'da büyütme efekti */
+    }
+    .icon-custom {
+      width: 50px; /* İkon boyutu */
+      height: 50px; /* İkon boyutu */
+	 
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+    var map = L.map('map', {
+      minZoom: 5, // Minimum zoom seviyesi
+      maxZoom: 10  // Maksimum zoom seviyesi
+    }).setView([39, 35], 7);
+
+    // Harita katmanı
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: '&copy; <a href="https://www.arcgis.com/">ArcGIS</a>'
+    }).addTo(map);
+
+    // Semboller ve açıklamalar
+    var locations = [
+      {
+        name: "Zonguldak",
+        coords: [41.4515, 31.7988],
+        info: "Zonguldak ve çevresinde çıkarılan taş kömürü enerji üretiminde ve demir-çelik sanayisinde kullanılmaktadır.",
+        img: "img2/komur.jpg",
+        icon: "img/coal.png" // Taş kömürü ikonu --
+      },
+      {
+        name: "Ordu ve Giresun",
+        coords: [40.9833, 38.4200],
+        info: "Ordu ve Giresun’da üretilen fındık, gıda sanayisinde kullanılmakta ve doğrudan tüketilmektedir.",
+            img: "img2/findik.jpg",
+        icon: "img/hazelnut.png"  // Fındık ikonu ---
+      },
+      {
+        name: "Artvin, Rize ve Trabzon",
+        coords: [41.0000, 40.0000],
+        info: "Artvin, Rize ve Trabzon’da ormancılık faaliyetleri yapılmaktadır.",
+        img: "img2/orman.jpg",
+        icon: "img/forest.png" // Orman ikonu ---
+      },
+      {
+        name: "Erzurum, Kars ve Ardahan",
+        coords: [39.9334, 41.2675],
+        info: "Erzurum, Kars ve Ardahan’da büyükbaş hayvancılık ve buna bağlı gıda ürünleri üretimi yapılmaktadır.",
+       img: "img2/tarim.jpg",
+         icon: "img/cattle.png"  // Hayvancılık ikonu --
+      },
+      {
+        name: "Bursa",
+        coords: [40.1826, 29.0663],
+        info: "Bursa, otomotiv sanayinin geliştiği illerden biridir. Bu ildeki fabrikalarda otomobil ve ticari araçların üretimi yapılmaktadır.",
+        img: "img2/araba.jpg",
+        icon: "img/electric-car.png" // Otomotiv ikonu ---
+      },
+      {
+        name: "Muğla",
+        coords: [37.2153, 28.3632],
+        info: "Muğla ve çevresi Türkiye’de yaz turizminin geliştiği yerler arasındadır. Her yıl buralara milyonlarca yerli ve yabancı turist gelmektedir.",
+        img: "img2/turizm.jpg",
+        icon: "img/beach.png" // Turizm ikonu --
+      },
+      {
+        name: "Eskişehir ve Kütahya",
+        coords: [39.7769, 30.5206],
+        info: "Bor, dünyada en fazla Türkiye’de bulunan stratejik bir madendir. Eskişehir ve Kütahya bor üretiminin yoğun yapıldığı iller arasındadır.",
+         img: "img2/bor.jpg",
+        icon: "img/crystal.png" // Bor ikonu ---
+      },
+      {
+        name: "Konya",
+        coords: [37.8746, 32.4932],
+        info: "Konya, Türkiye’nin buğday ambarıdır. Konya’da buğdayla birlikte arpa ve şeker pancarı tarımı ile buna bağlı gıdaların üretimi yapılmaktadır.",
+        img: "img2/bugday.jpg",
+        icon: "img/wheat.png" // Buğday ikonu ---
+      },
+      {
+        name: "Batman ve Şırnak",
+        coords: [37.8662, 41.1562],
+        info: "Batman, Şırnak en fazla petrol çıkarılan illerimiz arasındadır. Batman’daki rafineride bu bölgelerden çıkarılan ham petrol işlenir.",
+        img: "img2/petrol.jpg",
+        icon: "img/oil-pump.png" // Petrol ikonu ---
+      },
+      {
+        name: "İstanbul Boğazı",
+        coords: [41.1582, 29.0601],
+        info: "İstanbul Boğazı, Marmara Denizi ve Çanakkale Boğazı uluslararası deniz ticareti ve ulaşımında kullanılmaktadır.",
+       img: "img2/bogaz.jpg",
+        icon: "img/wheat.png" // Boğaz ikonu ---
+      },
+    ];
+
+    // Marker ve etiketler
+    locations.forEach(location => {
+      L.marker(location.coords, {
+        icon: L.divIcon({
+          className: 'icon-custom',
+          html: `<div class="icon-container"><img src="${location.icon}" class="icon-custom" alt="${location.name} ikonu"></div>`,
+          iconSize: [50, 50]
+        })
+      }).addTo(map)
+        .on('click', function () {
+          L.popup()
+            .setLatLng(location.coords)
+            .setContent(`<strong>${location.name}</strong><br>${location.info}<br><img class="popup-img" src="${location.img}" alt="${location.name} görseli">`)
+            .openOn(map);
+        });
+    });
+  </script>
+  <div class="bottom-bar"></div>
+</body>
+</html>
