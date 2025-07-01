@@ -10,11 +10,14 @@
     html, body {
       height: 100%;
       margin: 0;
+      font-family: Arial, sans-serif;
     }
+
     #map {
       height: 100%;
       width: 100%;
     }
+
     .bottom-bar {
       width: 100%;
       height: 1.2rem;
@@ -24,43 +27,122 @@
       left: 0;
       z-index: 9999;
     }
+
     .popup-img {
       width: 100%;
       max-width: 220px;
       margin-top: 8px;
       border-radius: 4px;
     }
+
     .icon-container {
       background-color: white; /* Arka plan rengi */
       border: 2px solid #ccc; /* Çerçeve rengi */
       border-radius: 4px; /* Kenar yuvarlama */
       padding: 1px; /* İç boşluk */
       display: inline-block; /* Dikey hizalama için */
-	
     }
-	  .icon-container:hover {
-      border-color: #sss; /* Hover rengi */
+
+    .icon-container:hover {
+      border-color: #007bff; /* Hover rengi */
       transform: scale(1.1); /* Hover'da büyütme efekti */
     }
+
     .icon-custom {
       width: 50px; /* İkon boyutu */
       height: 50px; /* İkon boyutu */
-	 
     }
+
+    /* Loading animasyonu */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 1);
+      background-color: rgba(255, 255, 255, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+	  
+    }
+
+    .loader {
+      border: 8px solid #f3f3f3; /* Gri dış daire */
+      border-top: 8px solid #3498db; /* Mavi renkli iç daire */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
   </style>
 </head>
 <body>
+  <!-- Loading ekranı -->
+  <div id="loading">
+ 
+
+    <div class="loader"></div>
+	<BR>
+	 <H2>YÜKLENİYOR</H2>
+  </div>
+
   <div id="map"></div>
+
   <script>
     var map = L.map('map', {
       minZoom: 5, // Minimum zoom seviyesi
       maxZoom: 10  // Maksimum zoom seviyesi
     }).setView([39, 35], 7);
 
+    // Resimleri önbelleğe alma
+    var images = [
+      "img2/komur.jpg",
+      "img2/findik.jpg",
+      "img2/orman.jpg",
+      "img2/tarim.jpg",
+      "img2/araba.jpg",
+      "img2/turizm.jpg",
+      "img2/bor.jpg",
+      "img2/bugday.jpg",
+      "img2/petrol.jpg",
+      "img2/bogaz.jpg",
+      "img/coal.png",
+      "img/hazelnut.png",
+      "img/forest.png",
+      "img/cattle.png",
+      "img/electric-car.png",
+      "img/beach.png",
+      "img/crystal.png",
+      "img/wheat.png",
+      "img/oil-pump.png"
+    ];
+
+    // Resimleri yükleme fonksiyonu
+    function preloadImages(urls) {
+      var preloadedImages = [];
+      for (var i = 0; i < urls.length; i++) {
+        var img = new Image();
+        img.src = urls[i];
+        preloadedImages.push(img);
+      }
+    }
+
     // Harita katmanı
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
       attribution: '&copy; <a href="https://www.arcgis.com/">ArcGIS</a>'
     }).addTo(map);
+
+    // Sayfa açıldığında resimleri yüklemeye başla
+    preloadImages(images);
 
     // Semboller ve açıklamalar
     var locations = [
@@ -75,7 +157,7 @@
         name: "Ordu ve Giresun",
         coords: [40.9833, 38.4200],
         info: "Ordu ve Giresun’da üretilen fındık, gıda sanayisinde kullanılmakta ve doğrudan tüketilmektedir.",
-            img: "img2/findik.jpg",
+        img: "img2/findik.jpg",
         icon: "img/hazelnut.png"  // Fındık ikonu ---
       },
       {
@@ -89,8 +171,8 @@
         name: "Erzurum, Kars ve Ardahan",
         coords: [39.9334, 41.2675],
         info: "Erzurum, Kars ve Ardahan’da büyükbaş hayvancılık ve buna bağlı gıda ürünleri üretimi yapılmaktadır.",
-       img: "img2/tarim.jpg",
-         icon: "img/cattle.png"  // Hayvancılık ikonu --
+        img: "img2/tarim.jpg",
+        icon: "img/cattle.png"  // Hayvancılık ikonu --
       },
       {
         name: "Bursa",
@@ -110,7 +192,7 @@
         name: "Eskişehir ve Kütahya",
         coords: [39.7769, 30.5206],
         info: "Bor, dünyada en fazla Türkiye’de bulunan stratejik bir madendir. Eskişehir ve Kütahya bor üretiminin yoğun yapıldığı iller arasındadır.",
-         img: "img2/bor.jpg",
+        img: "img2/bor.jpg",
         icon: "img/crystal.png" // Bor ikonu ---
       },
       {
@@ -131,7 +213,7 @@
         name: "İstanbul Boğazı",
         coords: [41.1582, 29.0601],
         info: "İstanbul Boğazı, Marmara Denizi ve Çanakkale Boğazı uluslararası deniz ticareti ve ulaşımında kullanılmaktadır.",
-       img: "img2/bogaz.jpg",
+        img: "img2/bogaz.jpg",
         icon: "img/wheat.png" // Boğaz ikonu ---
       },
     ];
@@ -152,7 +234,15 @@
             .openOn(map);
         });
     });
+
+    // Loading ekranını 3 saniye sonra kaldır
+    window.onload = function() {
+      setTimeout(function() {
+        document.getElementById('loading').style.display = 'none';
+      }, 1000); // 3 saniye sonra loading ekranını gizle
+    };
   </script>
+
   <div class="bottom-bar"></div>
 </body>
 </html>
